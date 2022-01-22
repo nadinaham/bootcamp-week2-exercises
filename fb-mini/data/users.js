@@ -3,10 +3,12 @@ const casual = require('casual')
 casual.define('user', () => ({
   id: casual.uuid,
   email: casual.email,
+  password: casual.password,
+  firstName: casual.first_name,
+  lastName: casual.last_name,
   created_at: casual.moment,
   updated_at: casual.moment,
 }))
-
 
 const userData = []
 

@@ -1,5 +1,7 @@
 const cleanup = require('../lib/cleanup')
 // Import models
+const User = require('../models/User')
+const Pet = require('../models/Pet')
 
 const run = async () => {
   /**
@@ -9,6 +11,38 @@ const run = async () => {
     the transaction by throwing an error: throw new Error("This is an error").
    */
 
+  const newUser = await User.transaction(async trx => {
+    const hadine = await User
+      .query(trx)
+      .insert({ 
+        firstName: "hadine", 
+        lastName: "ban", 
+        email: "totallynotnadine@gmail.com", 
+        age: "52",
+      })
+      .returning('*')
+    
+    const billy = await hadine
+      .$relatedQuery('owned_pets', trx)
+      .insert({
+        name: "billy", 
+        type: "CAT",
+      })
+
+    // throw new Error ("error!!!! >:(")
+
+    const petNumber = await Pet.query(trx).resultSize()
+
+    if (petNumber > 15) {
+      const removeBirbs = await Pet
+        .query(trx)
+        .delete()
+        .where({type: "BIRD"})
+    }
+
+    console.log(hadine)
+    console.log(billy)
+  })
 
   // -----
   cleanup()
